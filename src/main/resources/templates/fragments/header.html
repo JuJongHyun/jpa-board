@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<header th:fragment="header" class="bg-primary text-white p-3 mb-3">
+    <div class="container">
+        <nav class="navbar navbar-expand-lg navbar-dark">
+            <a class="navbar-brand" th:href="@{/}">Spring Board</a>
+            <div class="navbar-nav">
+                <a class="nav-link" th:href="@{/}">홈</a>
+                <a class="nav-link" th:href="@{/boards}">게시판</a>
+            </div>
+        </nav>
+    </div>
+</header>
+</html>
