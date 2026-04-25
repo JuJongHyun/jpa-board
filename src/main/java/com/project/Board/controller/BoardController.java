@@ -1,38 +1,44 @@
 package com.project.Board.controller;
 
-import com.project.Board.dto.BoardDTO;
 import com.project.Board.dto.BoardForm;
+import com.project.Board.dto.BoardListResponse;
+import com.project.Board.service.BoardService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
 
 @Controller
 @RequestMapping("/boards")
 @RequiredArgsConstructor
 public class BoardController {
 
+    private final BoardService boardService;
+
     // 게시글 목록 조회
     @GetMapping
-    public String list(Model model) {
+    public String list(
+                    @RequestParam(defaultValue = "0") int page,
+                    @RequestParam(defaultValue = "10") int size,
+                    @RequestParam(required = false) String keyword,
+                    Model model) {
 
-        List<BoardDTO> boards = Arrays.asList(
-                new BoardDTO(1L, "첫 번째 게시글", "홍길동", LocalDateTime.now()),
-                new BoardDTO(2L, "두 번째 게시글", "태종", LocalDateTime.now().minusDays(1)),
-                new BoardDTO(3L, "세 번째 게시글", "이순신", LocalDateTime.now().minusDays(2))
-        );
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
+        Page<BoardListResponse> boardPage = boardService.search(keyword, pageable);
 
-        model.addAttribute("boards", boards);
+        model.addAttribute("boards", boardPage.getContent());
+        model.addAttribute("page", boardPage);
+        model.addAttribute("keyword", keyword);
+
+
         return "boards/list";
     }
 
