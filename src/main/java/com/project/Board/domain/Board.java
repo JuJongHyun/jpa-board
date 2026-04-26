@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Entity
@@ -25,7 +27,12 @@ public class Board {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
-    private String writerName;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    private Member member;
+
+    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> comments = new ArrayList<>();
 
     @Column(nullable = false)
     private int viewCount;
@@ -47,10 +54,10 @@ public class Board {
     }
 
     @Builder
-    public Board(String title, String content, String writerName) {
+    public Board(String title, String content, Member member) {
         this.title = title;
         this.content = content;
-        this.writerName = writerName;
+        this.member = member;
     }
 
     public void update(String title, String content) {
@@ -60,5 +67,13 @@ public class Board {
 
     public void increaseViewCount() {
         this.viewCount++;
+    }
+
+    public String getWriterName() {
+        return this.member != null ? this.member.getName() : "익명";
+    }
+
+    public void addComment(Comment comment) {
+        this.comments.add(comment);
     }
 }
